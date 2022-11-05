@@ -1,10 +1,15 @@
 package app;
 
+import java.awt.Component;
+import java.awt.image.BufferedImage;
 import java.sql.SQLException;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -52,7 +57,27 @@ public class EmploymentInfoFrame extends CommonFrame {
 			}
 		};
 		var table = new JTable(model);
-		var renderer = new DefaultTableCellRenderer();
+		
+		var renderer = new DefaultTableCellRenderer() {
+			@Override
+			public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+					boolean hasFocus, int row, int column) {
+				
+				var comp = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+				
+				if (column == 0) {
+					var img = (BufferedImage) value;
+					
+					this.setIcon(new ImageIcon( img.getScaledInstance(40, 40, 4) ));
+					this.setText("");
+				} else {
+					this.setIcon(null);
+				}
+				
+				return comp;
+			}
+		};
+		
 		int[] widthList = {80, 200, 100, 60, 160, 180, 100, 50};
 		
 		renderer.setHorizontalAlignment(0);
@@ -81,8 +106,10 @@ public class EmploymentInfoFrame extends CommonFrame {
 				model.setRowCount(0);
 				
 				while (rs.next()) {
+					var img = ImageIO.read( rs.getBlob(10).getBinaryStream() );
+							
 					model.addRow(new Object[] {
-						"",
+						img,
 						rs.getString(2),
 						rs.getInt(3) + "/" + rs.getInt(4),
 						String.format("%,d", rs.getInt(5)),
