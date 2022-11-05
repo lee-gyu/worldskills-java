@@ -1,9 +1,16 @@
 package app;
 
+import java.sql.SQLException;
+
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
 
 public class EmploymentInfoFrame extends CommonFrame {
 
@@ -38,6 +45,63 @@ public class EmploymentInfoFrame extends CommonFrame {
 		add( setBounds(btnSearch, 520, 120, 90, 28) );
 		add( setBounds(btnApply, 620, 120, 90, 28) );
 		
+		var model = new DefaultTableModel("이미지,공고명,모집정원,시급,직종,지역,학력,성별".split(","), 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
+		var table = new JTable(model);
+		var renderer = new DefaultTableCellRenderer();
+		int[] widthList = {80, 200, 100, 60, 160, 180, 100, 50};
+		
+		renderer.setHorizontalAlignment(0);
+		
+		for (int i = 0; i < 8; i++) {
+			table.getColumnModel().getColumn(i).setCellRenderer(renderer);
+			table.getColumnModel().getColumn(i).setPreferredWidth(widthList[i]);
+		}
+		
+		table.getTableHeader().setResizingAllowed(false);
+		table.getTableHeader().setReorderingAllowed(false);
+		table.setRowHeight(40);
+				
+		add( setBounds(new JScrollPane(table), 10, 170, 710, 330) );
+		
+		btnSearch.addActionListener(e -> {
+			
+			try(var rs = getResulSet("SELECT e.e_no, e_title, COUNT(1) AS cnt, e_people, e_pay, c_category, c_address, e_graduate, e_gender, c_img\r\n"
+					+ "FROM 2022지방_2.employment e\r\n"
+					+ "INNER JOIN company c ON e.c_no = c.c_no\r\n"
+					+ "INNER JOIN applicant a ON e.e_no = a.e_no\r\n"
+					+ "WHERE a.a_apply != 2\r\n"
+					+ "GROUP BY e.e_no;")) {
+				
+				// 기존 데이터 삭제
+				model.setRowCount(0);
+				
+				while (rs.next()) {
+					model.addRow(new Object[] {
+						"",
+						rs.getString(2),
+						rs.getInt(3) + "/" + rs.getInt(4),
+						String.format("%,d", rs.getInt(5)),
+						rs.getString(6),
+						rs.getString(7),
+						rs.getInt(8),
+						rs.getInt(9)
+					});
+				}
+				
+				
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+		});
+		
+		btnSearch.doClick();
 	}
 	
 	public static void main(String[] args) {
