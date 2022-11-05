@@ -59,8 +59,6 @@ public class LoginFrame extends CommonFrame {
 				
 				MainFrame.userNo = rs.getInt("u_no");
 				
-				new MainFrame().setVisible(true);
-				
 			} catch (Exception e1) {
 				e1.printStackTrace();
 			}
