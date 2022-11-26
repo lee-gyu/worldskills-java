@@ -46,7 +46,7 @@ public class ChartFrame extends CommonFrame {
 					g.fillRect(50 + (i-1) * 100, y, 40, height);
 					g.setColor(Color.black);
 					g.drawRect(50 + (i-1) * 100, y, 40, height);
-					g.drawString( i + "0대", 60 + (i-1) * 100, 340);
+					g.drawString( i + "0대", 60 + (i-1) * 100, barHeight + 20);
 				}
 			}
 		};
