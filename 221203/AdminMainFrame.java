@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
@@ -37,6 +38,7 @@ public class AdminMainFrame extends CommonFrame {
 			
 			while (rs.next()) {
 				int cNo = rs.getInt("c_no");
+				var image = ImageIO.read( rs.getBlob("c_img").getBinaryStream() );
 				var img = new JLabel() {
 					
 					@Override
@@ -46,11 +48,11 @@ public class AdminMainFrame extends CommonFrame {
 						g2d.setComposite( AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 
 								cNo == hoveredCompanyNo ? 1f : 0.2f) );
 						
+						this.setIcon(new ImageIcon(image.getScaledInstance(this.getWidth(), this.getHeight(), Image.SCALE_SMOOTH)));
+						
 						super.paint(g);
 					}
 				};
-				
-				var image = ImageIO.read( rs.getBlob("c_img").getBinaryStream() );
 			
 				img.addMouseListener(new MouseAdapter() {
 					@Override
@@ -67,7 +69,6 @@ public class AdminMainFrame extends CommonFrame {
 				});
 				
 				img.setToolTipText(rs.getString("c_name"));
-				img.setIcon(new ImageIcon(image));
 				img.setBorder(new LineBorder(Color.BLACK));
 				
 				cPanel.add(img);
